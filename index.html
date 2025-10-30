@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>3D Galerie – Thumbnails & Materialfarbe</title>
+    <title>3D Galerie – Sunshine, USB Swing & Klappmouse</title>
 
-    <!-- model-viewer (nur Modul-Build) -->
+    <!-- model-viewer -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 
     <style>
@@ -67,15 +67,13 @@
     <div class="wrap">
       <header>
         <h1>3D Galerie</h1>
-        <p>Modell per Thumbnail wählen, Material auswählen &amp; live einfärben</p>
+        <p>Sunshine, USB Swing &amp; Klappmouse – Materialien live einfärben</p>
       </header>
 
-      <!-- 🔽 Modell-Grid (Thumbnails) -->
-      <div id="grid" class="grid">
-        <!-- Karten werden per JS gefüllt -->
-      </div>
+      <!-- 🔽 Modell-Grid -->
+      <div id="grid" class="grid"></div>
 
-      <!-- Toolbar: Materialauswahl + Farben -->
+      <!-- Toolbar -->
       <div class="toolbar">
         <select id="materialSelect" class="select" title="Material auswählen">
           <option>Materialien werden geladen…</option>
@@ -105,7 +103,7 @@
 
       <!-- Hauptviewer -->
       <model-viewer id="mv"
-        src="assets/sunshine_web_0004.glb"
+        src="assets/klappmouse_bake_0003.glb"
         alt="3D-Modell"
         camera-controls
         auto-rotate
@@ -134,13 +132,13 @@
       const listEl = document.getElementById('materialsContent');
       const alertEl = document.getElementById('alert');
 
-      // ✅ Deine Modelle (Label + Pfad in assets/)
+      // ✅ Alle Modelle
       const models = [
+        { label: 'Klappmouse', src: 'assets/klappmouse_bake_0003.glb' },
         { label: 'Sunshine',  src: 'assets/sunshine_web_0004.glb' },
         { label: 'USB Swing', src: 'assets/usb_swing_web_0003.glb' }
       ];
 
-      // (Optional) gemerkte Farbe pro Modell+Material
       const colorState = new Map(); // key: modelSrc|materialName  value: hex
 
       function hexToRgba01(hex, a=1){
@@ -224,23 +222,18 @@
         const key = `${mv.src}|${mat?.name}`;
         const remembered = colorState.get(key);
         if (remembered) setMaterialColor(remembered);
-        else setMaterialColor('#dddddd'); // Default dezent
+        else setMaterialColor('#dddddd');
       }
 
       function resetMaterialColor(){ setMaterialColor('#ffffff'); }
 
       async function selectModel(src, cardEl){
-        // Hauptviewer auf neues Modell setzen
         mv.src = src;
-        // aktive Karte markieren
         if (cardEl) markActive(cardEl);
-        // Materialliste wird im 'load'-Handler neu aufgebaut
         materialSelect.innerHTML = '<option>Lade Materialien…</option>';
-        // sanft zum Viewer scrollen (optional)
         mv.scrollIntoView({behavior:'smooth', block:'center'});
       }
 
-      // UI-Events
       document.querySelectorAll('.swatch,[data-color]').forEach(el=>{
         el.addEventListener('click',()=> {
           const hex = el.getAttribute('data-color');
@@ -254,7 +247,6 @@
       document.getElementById('resetBtn').addEventListener('click', resetMaterialColor);
       materialSelect.addEventListener('change', ()=> applyRememberedColor());
 
-      // Reagiere auf geladenes Modell: Materialien neu einlesen
       mv.addEventListener('load', ()=>{
         const mats = mv?.model?.materials || [];
         if(!mats.length){
@@ -269,9 +261,8 @@
         applyRememberedColor();
       });
 
-      // Init
+      // Initialisierung
       fillGrid();
-      // Start: erstes Modell aktivieren
       selectModel(models[0].src, document.querySelector('.card'));
     </script>
   </body>
