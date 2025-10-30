@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Klappmouse 3D – Farbwechsel</title>
+    <title>Klappmouse 3D – Materialwahl & Farbe</title>
 
-    <!-- model-viewer -->
+    <!-- model-viewer (nur Modul-Build) -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 
     <style>
@@ -30,9 +30,12 @@
         border-radius: 16px;
         box-shadow: 0 10px 36px rgba(0,0,0,.08);
       }
-      .controls {
-        display:flex; flex-wrap:wrap; gap:10px; align-items:center;
-        margin: 14px 0 4px;
+
+      .toolbar {
+        display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin: 14px 0 6px;
+      }
+      .select {
+        padding:8px 12px; border:1px solid #ddd; border-radius:10px; background:#fff; font-weight:600;
       }
       .chip {
         appearance: none; border:1px solid #ddd; padding:8px 12px; border-radius: 999px;
@@ -43,51 +46,30 @@
         width: 28px; height: 28px; border-radius: 50%; border:1px solid #ddd; cursor:pointer;
       }
       .picker {
-        display:flex;
-        align-items:center;
-        gap:12px;
-        background:#fff;
-        border:1px solid #ddd;
-        padding:6px 10px;
-        border-radius:10px;
-        box-shadow:0 2px 6px rgba(0,0,0,0.05);
-        margin-left:auto;
+        display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #ddd;
+        padding:6px 10px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.05); margin-left:auto;
       }
-      #colorInput {
-        width:32px;
-        height:32px;
-        border:none;
-        cursor:pointer;
-        background:transparent;
-      }
+      #colorInput { width:32px; height:32px; border:none; cursor:pointer; background:transparent; }
+
       .note { font-size:12px; color:var(--muted); margin-top: 6px; }
       .alert { background:#fff3cd; color:#7a5b00; border:1px solid #ffe08a; padding:8px 12px; border-radius:10px; display:none; margin: 10px 0; }
-      footer { text-align:center; color:var(--muted); font-size:12px; margin:18px 0 8px; }
+
       #materialsList {
-        margin-top: 14px;
-        font-size: 14px;
-        background: #f8fafc;
-        border: 1px solid #e5e7eb;
-        padding: 10px 14px;
-        border-radius: 10px;
-        color: #111;
+        margin-top: 12px; font-size: 14px; background: #f8fafc; border: 1px solid #e5e7eb;
+        padding: 10px 14px; border-radius: 10px; color: #111;
       }
-      #materialsContent {
-        margin-top:6px;
-        font-family: monospace;
-        color:#444;
-        line-height:1.4;
-      }
+      #materialsContent { margin-top:6px; font-family: monospace; color:#444; line-height:1.4; }
+      footer { text-align:center; color:var(--muted); font-size:12px; margin:18px 0 8px; }
     </style>
   </head>
   <body>
     <div class="wrap">
       <header>
         <h1>Klappmouse 3D</h1>
-        <p>Farbe des Materials <code>plastik1</code> live ändern</p>
+        <p>Material auswählen &amp; Farbe live ändern</p>
       </header>
 
-      <div id="alert" class="alert">Material <b>plastik1</b> wurde nicht gefunden. Verfügbare Namen stehen unten.</div>
+      <div id="alert" class="alert">Kein Material gefunden. Bitte prüfe dein Modell.</div>
 
       <model-viewer id="mv"
         src="assets/klappmouse_bake_0003.glb"
@@ -102,20 +84,18 @@
         reveal="auto">
       </model-viewer>
 
-      <!-- Materialliste -->
-      <div id="materialsList">
-        <strong>Materialien im Modell:</strong>
-        <div id="materialsContent">(werden nach dem Laden angezeigt...)</div>
-      </div>
+      <!-- Toolbar: Materialauswahl + Farben -->
+      <div class="toolbar">
+        <select id="materialSelect" class="select">
+          <option>Materialien werden geladen…</option>
+        </select>
 
-      <!-- Steuerleiste -->
-      <div class="controls">
         <!-- Preset-Farben -->
-        <button class="swatch" style="background:#111111" data-color="#111111"></button>
-        <button class="swatch" style="background:#e11d48" data-color="#e11d48"></button>
-        <button class="swatch" style="background:#0ea5e9" data-color="#0ea5e9"></button>
-        <button class="swatch" style="background:#10b981" data-color="#10b981"></button>
-        <button class="swatch" style="background:#ffffff" data-color="#ffffff"></button>
+        <button class="swatch" style="background:#111111" data-color="#111111" title="#111111"></button>
+        <button class="swatch" style="background:#e11d48" data-color="#e11d48" title="#e11d48"></button>
+        <button class="swatch" style="background:#0ea5e9" data-color="#0ea5e9" title="#0ea5e9"></button>
+        <button class="swatch" style="background:#10b981" data-color="#10b981" title="#10b981"></button>
+        <button class="swatch" style="background:#ffffff" data-color="#ffffff" title="#ffffff"></button>
 
         <!-- Schnell-Buttons -->
         <button class="chip" data-color="#222222">Dunkel</button>
@@ -130,14 +110,21 @@
         </div>
       </div>
 
-      <div class="note">Wenn das Material eine Base-Color-Textur hat, wirkt die Farbe als Tönung über der Textur.</div>
+      <!-- Materialliste unter dem Viewer -->
+      <div id="materialsList">
+        <strong>Materialien im Modell:</strong>
+        <div id="materialsContent">(werden nach dem Laden angezeigt...)</div>
+      </div>
 
+      <div class="note">Hinweis: Hat ein Material eine Base-Color-Textur, wirkt die neue Farbe als Tönung über der Textur.</div>
       <footer>Präsentiert mit <code>&lt;model-viewer&gt;</code></footer>
     </div>
 
     <script>
       const mv = document.getElementById('mv');
-      const targetMaterialName = 'plastik1'; // Zielmaterialname
+      const selectEl = document.getElementById('materialSelect');
+      const listEl = document.getElementById('materialsContent');
+      const alertEl = document.getElementById('alert');
 
       function hexToRgba01(hex, a = 1) {
         const m = hex.replace('#','').trim();
@@ -148,24 +135,30 @@
         return [r/255, g/255, b/255, a];
       }
 
-      function findMaterialByName(materials, name) {
-        const n = name.toLowerCase();
-        return materials.find(m => (m?.name || '').toLowerCase() === n) || null;
+      function setSelectOptions(materials) {
+        selectEl.innerHTML = '';
+        materials.forEach((m, i) => {
+          const opt = document.createElement('option');
+          opt.value = m.name || `Material ${i+1}`;
+          opt.textContent = opt.value;
+          selectEl.appendChild(opt);
+        });
+      }
+
+      function getSelectedMaterial() {
+        const mats = mv?.model?.materials || [];
+        const wanted = (selectEl.value || '').toLowerCase();
+        return mats.find(m => (m?.name || '').toLowerCase() === wanted) || null;
       }
 
       async function setMaterialColor(hex) {
         await mv?.model?.materials;
         const mats = mv?.model?.materials || [];
-        if (!mats.length) return;
+        if (!mats.length) { alertEl.style.display = 'block'; return; }
 
-        let mat = findMaterialByName(mats, targetMaterialName);
-        if (!mat) {
-          document.getElementById('alert').style.display = 'block';
-          console.warn('Material nicht gefunden. Verfügbar:', mats.map(m => m.name));
-          mat = mats[0];
-        } else {
-          document.getElementById('alert').style.display = 'none';
-        }
+        const mat = getSelectedMaterial() || mats[0];
+        if (!mat) { alertEl.style.display = 'block'; return; }
+        alertEl.style.display = 'none';
 
         const rgba = hexToRgba01(hex, 1.0);
         mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
@@ -182,27 +175,30 @@
           if (hex) setMaterialColor(hex);
         });
       });
-
       document.getElementById('applyColor').addEventListener('click', () => {
         const hex = document.getElementById('colorInput').value || '#ffffff';
         setMaterialColor(hex);
       });
-
       document.getElementById('resetBtn').addEventListener('click', resetMaterialColor);
 
+      // Wenn Material gewechselt wird, sanft eine neutrale Farbe setzen
+      selectEl.addEventListener('change', () => setMaterialColor('#dddddd'));
+
+      // Nach dem Laden des Modells: Liste & Select befüllen
       mv.addEventListener('load', () => {
         const mats = mv?.model?.materials || [];
-        console.log('Materialien im Modell:', mats.map(m => m.name));
-
-        // Liste im HTML aktualisieren
-        const listEl = document.getElementById('materialsContent');
-        if (mats.length) {
-          listEl.innerHTML = mats.map(m => `• ${m.name}`).join('<br>');
-        } else {
+        if (!mats.length) {
           listEl.textContent = '(keine Materialien gefunden)';
+          alertEl.style.display = 'block';
+          return;
         }
+        // Liste im HTML
+        listEl.innerHTML = mats.map(m => `• ${m.name}`).join('<br>');
+        // Dropdown befüllen
+        setSelectOptions(mats);
 
-        // Startfarbe setzen (hellgrau)
+        // Standard: erstes Material wählen und hellgrau einfärben
+        selectEl.value = mats[0].name || selectEl.options[0]?.value;
         setMaterialColor('#dddddd');
       });
     </script>
