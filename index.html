@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Klappmouse 3D – Farbwechsel</title>
 
-    <!-- model-viewer (nur Modul-Build, Version fixiert) -->
+    <!-- model-viewer -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 
     <style>
@@ -42,20 +42,52 @@
       .swatch {
         width: 28px; height: 28px; border-radius: 50%; border:1px solid #ddd; cursor:pointer;
       }
-      .picker { display:flex; align-items:center; gap:8px; margin-left:auto; }
+      .picker {
+        display:flex;
+        align-items:center;
+        gap:12px;
+        background:#fff;
+        border:1px solid #ddd;
+        padding:6px 10px;
+        border-radius:10px;
+        box-shadow:0 2px 6px rgba(0,0,0,0.05);
+        margin-left:auto;
+      }
+      #colorInput {
+        width:32px;
+        height:32px;
+        border:none;
+        cursor:pointer;
+        background:transparent;
+      }
       .note { font-size:12px; color:var(--muted); margin-top: 6px; }
       .alert { background:#fff3cd; color:#7a5b00; border:1px solid #ffe08a; padding:8px 12px; border-radius:10px; display:none; margin: 10px 0; }
       footer { text-align:center; color:var(--muted); font-size:12px; margin:18px 0 8px; }
+      #materialsList {
+        margin-top: 14px;
+        font-size: 14px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        padding: 10px 14px;
+        border-radius: 10px;
+        color: #111;
+      }
+      #materialsContent {
+        margin-top:6px;
+        font-family: monospace;
+        color:#444;
+        line-height:1.4;
+      }
     </style>
   </head>
   <body>
     <div class="wrap">
       <header>
         <h1>Klappmouse 3D</h1>
-        <p>Farbe des Materials <code>Gruppe</code> live ändern</p>
+        <p>Farbe des Materials <code>plastik1</code> live ändern</p>
       </header>
 
-      <div id="alert" class="alert">Material <b>Gruppe</b> wurde nicht gefunden. Verfügbare Namen sind in der Browser-Konsole gelistet.</div>
+      <div id="alert" class="alert">Material <b>plastik1</b> wurde nicht gefunden. Verfügbare Namen stehen unten.</div>
 
       <model-viewer id="mv"
         src="assets/klappmouse_bake_0003.glb"
@@ -70,14 +102,20 @@
         reveal="auto">
       </model-viewer>
 
+      <!-- Materialliste -->
+      <div id="materialsList">
+        <strong>Materialien im Modell:</strong>
+        <div id="materialsContent">(werden nach dem Laden angezeigt...)</div>
+      </div>
+
       <!-- Steuerleiste -->
       <div class="controls">
-        <!-- Preset-Farben (Swatches) -->
-        <button class="swatch" style="background:#111111" title="#111111" data-color="#111111"></button>
-        <button class="swatch" style="background:#e11d48" title="#e11d48" data-color="#e11d48"></button>
-        <button class="swatch" style="background:#0ea5e9" title="#0ea5e9" data-color="#0ea5e9"></button>
-        <button class="swatch" style="background:#10b981" title="#10b981" data-color="#10b981"></button>
-        <button class="swatch" style="background:#ffffff" title="#ffffff" data-color="#ffffff"></button>
+        <!-- Preset-Farben -->
+        <button class="swatch" style="background:#111111" data-color="#111111"></button>
+        <button class="swatch" style="background:#e11d48" data-color="#e11d48"></button>
+        <button class="swatch" style="background:#0ea5e9" data-color="#0ea5e9"></button>
+        <button class="swatch" style="background:#10b981" data-color="#10b981"></button>
+        <button class="swatch" style="background:#ffffff" data-color="#ffffff"></button>
 
         <!-- Schnell-Buttons -->
         <button class="chip" data-color="#222222">Dunkel</button>
@@ -92,14 +130,14 @@
         </div>
       </div>
 
-      <div class="note">Hinweis: Wenn das Material eine Base-Color-Textur hat, wirkt die Farbe als Tönung über der Textur.</div>
+      <div class="note">Wenn das Material eine Base-Color-Textur hat, wirkt die Farbe als Tönung über der Textur.</div>
 
       <footer>Präsentiert mit <code>&lt;model-viewer&gt;</code></footer>
     </div>
 
     <script>
       const mv = document.getElementById('mv');
-      const targetMaterialName = 'mouse_1'; // Zielmaterial (case-insensitive)
+      const targetMaterialName = 'plastik1'; // Zielmaterialname
 
       function hexToRgba01(hex, a = 1) {
         const m = hex.replace('#','').trim();
@@ -124,7 +162,6 @@
         if (!mat) {
           document.getElementById('alert').style.display = 'block';
           console.warn('Material nicht gefunden. Verfügbar:', mats.map(m => m.name));
-          // Fallback: erstes Material einfärben
           mat = mats[0];
         } else {
           document.getElementById('alert').style.display = 'none';
@@ -132,19 +169,15 @@
 
         const rgba = hexToRgba01(hex, 1.0);
         mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
-        // Optional: leichte Standardwerte für ein „Kunststoff“-Gefühl
-        // mat.pbrMetallicRoughness.metallicFactor = 0.0;
-        // mat.pbrMetallicRoughness.roughnessFactor = 0.5;
       }
 
       function resetMaterialColor() {
-        // Setzt den BaseColorFactor auf neutral (weiß, unverändert)
         setMaterialColor('#ffffff');
       }
 
       // UI-Events
       document.querySelectorAll('.swatch,[data-color]').forEach(el => {
-        el.addEventListener('click', e => {
+        el.addEventListener('click', () => {
           const hex = el.getAttribute('data-color');
           if (hex) setMaterialColor(hex);
         });
@@ -157,11 +190,19 @@
 
       document.getElementById('resetBtn').addEventListener('click', resetMaterialColor);
 
-      // Nach dem Laden: Materialnamen in der Konsole anzeigen, einmal auf „hell“ setzen
       mv.addEventListener('load', () => {
         const mats = mv?.model?.materials || [];
         console.log('Materialien im Modell:', mats.map(m => m.name));
-        // Ein dezentes Standard-Setup (optional):
+
+        // Liste im HTML aktualisieren
+        const listEl = document.getElementById('materialsContent');
+        if (mats.length) {
+          listEl.innerHTML = mats.map(m => `• ${m.name}`).join('<br>');
+        } else {
+          listEl.textContent = '(keine Materialien gefunden)';
+        }
+
+        // Startfarbe setzen (hellgrau)
         setMaterialColor('#dddddd');
       });
     </script>
