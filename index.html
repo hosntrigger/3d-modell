@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Klappmouse 3D – Materialwahl & Farbe</title>
+    <title>Klappmouse 3D – Material „Gruppe“ färben</title>
 
     <!-- model-viewer (nur Modul-Build) -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
@@ -11,65 +11,42 @@
     <style>
       :root {
         color-scheme: light;
-        --page-bg: #ffffff;
-        --text: #111;
-        --muted: #666;
-        --panel: #f9f9f9;
-        --brand: #0ea5e9;
+        --page-bg:#fff; --text:#111; --muted:#666; --panel:#f9f9f9; --brand:#0ea5e9;
       }
-      * { box-sizing: border-box; }
-      html, body { margin:0; height:100%; background:var(--page-bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
-      .wrap { max-width: 980px; margin: 28px auto; padding: 0 16px; }
-      header { text-align: center; margin-bottom: 14px; }
-      header h1 { margin: 0; font-size: clamp(24px, 4vw, 34px); }
-      header p { margin: 6px 0 0; color: var(--muted); }
-      model-viewer {
-        width: 100%;
-        height: min(70vh, 80vw);
-        background: var(--panel);
-        border-radius: 16px;
-        box-shadow: 0 10px 36px rgba(0,0,0,.08);
+      *{box-sizing:border-box}
+      html,body{margin:0;height:100%;background:var(--page-bg);color:var(--text);
+        font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+      .wrap{max-width:980px;margin:28px auto;padding:0 16px}
+      header{text-align:center;margin-bottom:14px}
+      header h1{margin:0;font-size:clamp(24px,4vw,34px)}
+      header p{margin:6px 0 0;color:var(--muted)}
+      model-viewer{
+        width:100%; height:min(70vh,80vw); background:var(--panel);
+        border-radius:16px; box-shadow:0 10px 36px rgba(0,0,0,.08)
       }
-
-      .toolbar {
-        display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin: 14px 0 6px;
-      }
-      .select {
-        padding:8px 12px; border:1px solid #ddd; border-radius:10px; background:#fff; font-weight:600;
-      }
-      .chip {
-        appearance: none; border:1px solid #ddd; padding:8px 12px; border-radius: 999px;
-        background:white; cursor:pointer; font-weight:600;
-      }
-      .chip:hover { border-color:#ccc; }
-      .swatch {
-        width: 28px; height: 28px; border-radius: 50%; border:1px solid #ddd; cursor:pointer;
-      }
-      .picker {
-        display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #ddd;
-        padding:6px 10px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.05); margin-left:auto;
-      }
-      #colorInput { width:32px; height:32px; border:none; cursor:pointer; background:transparent; }
-
-      .note { font-size:12px; color:var(--muted); margin-top: 6px; }
-      .alert { background:#fff3cd; color:#7a5b00; border:1px solid #ffe08a; padding:8px 12px; border-radius:10px; display:none; margin: 10px 0; }
-
-      #materialsList {
-        margin-top: 12px; font-size: 14px; background: #f8fafc; border: 1px solid #e5e7eb;
-        padding: 10px 14px; border-radius: 10px; color: #111;
-      }
-      #materialsContent { margin-top:6px; font-family: monospace; color:#444; line-height:1.4; }
-      footer { text-align:center; color:var(--muted); font-size:12px; margin:18px 0 8px; }
+      .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 6px}
+      .select{padding:8px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;font-weight:600}
+      .chip{appearance:none;border:1px solid #ddd;padding:8px 12px;border-radius:999px;background:#fff;cursor:pointer;font-weight:600}
+      .chip:hover{border-color:#ccc}
+      .swatch{width:28px;height:28px;border-radius:50%;border:1px solid #ddd;cursor:pointer}
+      .picker{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #ddd;
+        padding:6px 10px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.05);margin-left:auto}
+      #colorInput{width:32px;height:32px;border:none;cursor:pointer;background:transparent}
+      .note{font-size:12px;color:var(--muted);margin-top:6px}
+      .alert{background:#fff3cd;color:#7a5b00;border:1px solid #ffe08a;padding:8px 12px;border-radius:10px;display:none;margin:10px 0}
+      #materialsList{margin-top:12px;font-size:14px;background:#f8fafc;border:1px solid #e5e7eb;padding:10px 14px;border-radius:10px;color:#111}
+      #materialsContent{margin-top:6px;font-family:monospace;color:#444;line-height:1.4}
+      footer{text-align:center;color:var(--muted);font-size:12px;margin:18px 0 8px}
     </style>
   </head>
   <body>
     <div class="wrap">
       <header>
         <h1>Klappmouse 3D</h1>
-        <p>Material auswählen &amp; Farbe live ändern</p>
+        <p>Material <code>Gruppe</code> auswählen &amp; live einfärben</p>
       </header>
 
-      <div id="alert" class="alert">Kein Material gefunden. Bitte prüfe dein Modell.</div>
+      <div id="alert" class="alert">Kein passendes Material gefunden. Bitte wähle eines im Dropdown aus.</div>
 
       <model-viewer id="mv"
         src="assets/klappmouse_bake_0003.glb"
@@ -84,7 +61,7 @@
         reveal="auto">
       </model-viewer>
 
-      <!-- Toolbar: Materialauswahl + Farben -->
+      <!-- Toolbar -->
       <div class="toolbar">
         <select id="materialSelect" class="select">
           <option>Materialien werden geladen…</option>
@@ -110,13 +87,13 @@
         </div>
       </div>
 
-      <!-- Materialliste unter dem Viewer -->
+      <!-- Materialliste -->
       <div id="materialsList">
         <strong>Materialien im Modell:</strong>
         <div id="materialsContent">(werden nach dem Laden angezeigt...)</div>
       </div>
 
-      <div class="note">Hinweis: Hat ein Material eine Base-Color-Textur, wirkt die neue Farbe als Tönung über der Textur.</div>
+      <div class="note">Wenn ein Material eine Base-Color-Textur hat, wirkt die neue Farbe als Tönung.</div>
       <footer>Präsentiert mit <code>&lt;model-viewer&gt;</code></footer>
     </div>
 
@@ -126,79 +103,101 @@
       const listEl = document.getElementById('materialsContent');
       const alertEl = document.getElementById('alert');
 
-      function hexToRgba01(hex, a = 1) {
+      // Wunschreihenfolge: „Gruppe“ zuerst; plus gängige Varianten als Fallback
+      const preferredNames = ['Gruppe', 'gruppe', 'plastik', 'plastic', 'kunststoff'];
+      const norm = s => (s||'').toLowerCase().replace(/\s|_|-/g,'');
+
+      function hexToRgba01(hex, a=1){
         const m = hex.replace('#','').trim();
-        const bigint = parseInt(m, 16);
-        const r = (bigint >> 16) & 255;
-        const g = (bigint >> 8) & 255;
-        const b = bigint & 255;
-        return [r/255, g/255, b/255, a];
+        const n = m.length===3 ? m.split('').map(c=>c+c).join('') : m;
+        const v = parseInt(n,16); const r=(v>>16)&255, g=(v>>8)&255, b=v&255;
+        return [r/255,g/255,b/255,a];
       }
 
-      function setSelectOptions(materials) {
-        selectEl.innerHTML = '';
-        materials.forEach((m, i) => {
-          const opt = document.createElement('option');
-          opt.value = m.name || `Material ${i+1}`;
-          opt.textContent = opt.value;
+      function setSelectOptions(materials){
+        selectEl.innerHTML='';
+        materials.forEach((m,i)=>{
+          const opt=document.createElement('option');
+          opt.value=m.name||`Material ${i+1}`;
+          opt.textContent=opt.value;
           selectEl.appendChild(opt);
         });
       }
 
-      function getSelectedMaterial() {
-        const mats = mv?.model?.materials || [];
-        const wanted = (selectEl.value || '').toLowerCase();
-        return mats.find(m => (m?.name || '').toLowerCase() === wanted) || null;
+      function findBestMaterial(materials){
+        if(!materials.length) return null;
+        // 1) exakter Name (case-insensitive)
+        for(const want of preferredNames){
+          const hit = materials.find(m=>norm(m.name)===norm(want));
+          if(hit) return hit;
+        }
+        // 2) Teiltreffer
+        for(const want of preferredNames){
+          const hit = materials.find(m=>norm(m.name).includes(norm(want)));
+          if(hit) return hit;
+        }
+        return materials[0];
       }
 
-      async function setMaterialColor(hex) {
+      function getSelectedMaterial(){
+        const mats = mv?.model?.materials || [];
+        const wanted = (selectEl.value||'').toLowerCase();
+        return mats.find(m => (m?.name||'').toLowerCase() === wanted) || null;
+      }
+
+      async function setMaterialColor(hex){
         await mv?.model?.materials;
         const mats = mv?.model?.materials || [];
-        if (!mats.length) { alertEl.style.display = 'block'; return; }
+        if(!mats.length){ alertEl.style.display='block'; return; }
 
         const mat = getSelectedMaterial() || mats[0];
-        if (!mat) { alertEl.style.display = 'block'; return; }
-        alertEl.style.display = 'none';
+        if(!mat){ alertEl.style.display='block'; return; }
+        alertEl.style.display='none';
 
-        const rgba = hexToRgba01(hex, 1.0);
+        const rgba = hexToRgba01(hex,1.0);
         mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
       }
 
-      function resetMaterialColor() {
-        setMaterialColor('#ffffff');
-      }
+      function resetMaterialColor(){ setMaterialColor('#ffffff'); }
 
-      // UI-Events
-      document.querySelectorAll('.swatch,[data-color]').forEach(el => {
-        el.addEventListener('click', () => {
-          const hex = el.getAttribute('data-color');
-          if (hex) setMaterialColor(hex);
+      // UI
+      document.querySelectorAll('.swatch,[data-color]').forEach(el=>{
+        el.addEventListener('click',()=>{
+          const hex=el.getAttribute('data-color'); if(hex) setMaterialColor(hex);
         });
       });
-      document.getElementById('applyColor').addEventListener('click', () => {
+      document.getElementById('applyColor').addEventListener('click',()=>{
         const hex = document.getElementById('colorInput').value || '#ffffff';
         setMaterialColor(hex);
       });
       document.getElementById('resetBtn').addEventListener('click', resetMaterialColor);
+      selectEl.addEventListener('change',()=> setMaterialColor('#dddddd'));
 
-      // Wenn Material gewechselt wird, sanft eine neutrale Farbe setzen
-      selectEl.addEventListener('change', () => setMaterialColor('#dddddd'));
-
-      // Nach dem Laden des Modells: Liste & Select befüllen
-      mv.addEventListener('load', () => {
+      // Nach dem Laden des Modells
+      mv.addEventListener('load',()=>{
         const mats = mv?.model?.materials || [];
-        if (!mats.length) {
-          listEl.textContent = '(keine Materialien gefunden)';
-          alertEl.style.display = 'block';
+        if(!mats.length){
+          listEl.textContent='(keine Materialien gefunden)';
+          alertEl.style.display='block';
           return;
         }
-        // Liste im HTML
-        listEl.innerHTML = mats.map(m => `• ${m.name}`).join('<br>');
-        // Dropdown befüllen
+
+        // Liste anzeigen
+        listEl.innerHTML = mats.map(m=>`• ${m.name}`).join('<br>');
+
+        // Dropdown füllen
         setSelectOptions(mats);
 
-        // Standard: erstes Material wählen und hellgrau einfärben
-        selectEl.value = mats[0].name || selectEl.options[0]?.value;
+        // „Gruppe“ bevorzugt auswählen (falls vorhanden)
+        const best = findBestMaterial(mats);
+        if(best){
+          selectEl.value = best.name || selectEl.options[0]?.value;
+          alertEl.style.display='none';
+        } else {
+          alertEl.style.display='block';
+        }
+
+        // Start: dezent einfärben
         setMaterialColor('#dddddd');
       });
     </script>
