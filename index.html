@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>3D Galerie – Modelle & Materialien</title>
+    <title>3D Galerie – Thumbnails & Materialfarbe</title>
 
     <!-- model-viewer (nur Modul-Build) -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
@@ -13,14 +13,41 @@
       *{box-sizing:border-box}
       html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
         font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-      .wrap{max-width:980px;margin:28px auto;padding:0 16px}
-      header{text-align:center;margin-bottom:14px}
+      .wrap{max-width:1160px;margin:28px auto;padding:0 16px}
+      header{text-align:center;margin-bottom:16px}
       header h1{margin:0;font-size:clamp(24px,4vw,34px)}
       header p{margin:6px 0 0;color:var(--muted)}
-      model-viewer{
-        width:100%;height:min(70vh,80vw);background:var(--panel);
-        border-radius:16px;box-shadow:0 10px 36px rgba(0,0,0,.08)
+
+      /* Grid für Thumbnails */
+      .grid{
+        display:grid;
+        grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
+        gap:16px;
+        margin:18px 0 6px;
       }
+      .card{
+        background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;
+        box-shadow:0 8px 20px rgba(0,0,0,.05); transition:transform .15s ease, box-shadow .15s ease;
+        cursor:pointer;
+      }
+      .card:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(0,0,0,.08); }
+      .thumb{
+        width:100%; height:180px; background:#f4f6f8;
+      }
+      .card h3{
+        margin:10px 12px 12px; font-size:16px; font-weight:700; color:#111;
+      }
+      .active{
+        outline:2px solid var(--brand);
+        box-shadow:0 0 0 3px rgba(14,165,233,.25);
+      }
+
+      /* Hauptviewer */
+      model-viewer#mv{
+        width:100%; height:min(64vh,70vw); background:var(--panel);
+        border-radius:16px; box-shadow:0 10px 36px rgba(0,0,0,.08)
+      }
+
       .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 6px}
       .select{padding:8px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;font-weight:600}
       .chip{appearance:none;border:1px solid #ddd;padding:8px 12px;border-radius:999px;background:#fff;cursor:pointer;font-weight:600}
@@ -40,13 +67,16 @@
     <div class="wrap">
       <header>
         <h1>3D Galerie</h1>
-        <p>Modell wählen, Material auswählen &amp; live einfärben</p>
+        <p>Modell per Thumbnail wählen, Material auswählen &amp; live einfärben</p>
       </header>
 
-      <!-- 🔽 Toolbar: Modell- & Material-Auswahl + Farben -->
+      <!-- 🔽 Modell-Grid (Thumbnails) -->
+      <div id="grid" class="grid">
+        <!-- Karten werden per JS gefüllt -->
+      </div>
+
+      <!-- Toolbar: Materialauswahl + Farben -->
       <div class="toolbar">
-        <select id="modelSelect" class="select" title="Modell auswählen"></select>
-        <span style="color:var(--muted);font-size:14px">•</span>
         <select id="materialSelect" class="select" title="Material auswählen">
           <option>Materialien werden geladen…</option>
         </select>
@@ -73,7 +103,7 @@
 
       <div id="alert" class="alert">Kein Material gefunden. Bitte wähle eines im Dropdown aus.</div>
 
-      <!-- Viewer -->
+      <!-- Hauptviewer -->
       <model-viewer id="mv"
         src="assets/sunshine_web_0004.glb"
         alt="3D-Modell"
@@ -93,13 +123,13 @@
         <div id="materialsContent">(werden nach dem Laden angezeigt...)</div>
       </div>
 
-      <div class="note">Hinweis: Bei Base-Color-Textur wirkt deine Farbe als Tönung. Lade zusätzliche GLBs in <code>assets/</code> und trage sie im <code>models</code>-Array (JS) ein.</div>
+      <div class="note">Hinweis: Bei Base-Color-Textur wirkt die neue Farbe als Tönung. Weitere Modelle einfach im JS-Array ergänzen.</div>
       <footer>Präsentiert mit <code>&lt;model-viewer&gt;</code></footer>
     </div>
 
     <script>
       const mv = document.getElementById('mv');
-      const modelSelect = document.getElementById('modelSelect');
+      const grid = document.getElementById('grid');
       const materialSelect = document.getElementById('materialSelect');
       const listEl = document.getElementById('materialsContent');
       const alertEl = document.getElementById('alert');
@@ -121,16 +151,38 @@
         return [r/255,g/255,b/255,a];
       }
 
-      function fillModelSelect() {
-        modelSelect.innerHTML = '';
-        models.forEach((m)=>{
-          const opt = document.createElement('option');
-          opt.value = m.src;
-          opt.textContent = m.label;
-          modelSelect.appendChild(opt);
+      function fillGrid(){
+        grid.innerHTML='';
+        models.forEach((m, idx)=>{
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.dataset.src = m.src;
+          if (idx===0) card.classList.add('active');
+
+          const thumb = document.createElement('model-viewer');
+          thumb.className = 'thumb';
+          thumb.src = m.src;
+          thumb.setAttribute('reveal','interaction');
+          thumb.setAttribute('camera-controls','');
+          thumb.setAttribute('environment-image','neutral');
+          thumb.setAttribute('exposure','1');
+          thumb.setAttribute('shadow-intensity','0.15');
+          thumb.setAttribute('shadow-softness','0.8');
+          thumb.setAttribute('tone-mapping','aces');
+
+          const title = document.createElement('h3');
+          title.textContent = m.label;
+
+          card.appendChild(thumb);
+          card.appendChild(title);
+          card.addEventListener('click', ()=> selectModel(m.src, card));
+          grid.appendChild(card);
         });
-        // Start: erstes Modell
-        modelSelect.value = models[0].src;
+      }
+
+      function markActive(card){
+        document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
+        card.classList.add('active');
       }
 
       function fillMaterialSelect(materials){
@@ -161,7 +213,6 @@
         const rgba = hexToRgba01(hex, 1.0);
         mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
 
-        // Zustand merken
         const key = `${mv.src}|${mat.name}`;
         colorState.set(key, hex);
       }
@@ -178,6 +229,17 @@
 
       function resetMaterialColor(){ setMaterialColor('#ffffff'); }
 
+      async function selectModel(src, cardEl){
+        // Hauptviewer auf neues Modell setzen
+        mv.src = src;
+        // aktive Karte markieren
+        if (cardEl) markActive(cardEl);
+        // Materialliste wird im 'load'-Handler neu aufgebaut
+        materialSelect.innerHTML = '<option>Lade Materialien…</option>';
+        // sanft zum Viewer scrollen (optional)
+        mv.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+
       // UI-Events
       document.querySelectorAll('.swatch,[data-color]').forEach(el=>{
         el.addEventListener('click',()=> {
@@ -190,17 +252,9 @@
         setMaterialColor(hex);
       });
       document.getElementById('resetBtn').addEventListener('click', resetMaterialColor);
-
-      // Modellwechsel
-      modelSelect.addEventListener('change', ()=>{
-        mv.src = modelSelect.value;                 // src umschalten
-        materialSelect.innerHTML = '<option>Lade Materialien…</option>';
-      });
-
-      // Materialwechsel → gemerkte Farbe/Default anwenden
       materialSelect.addEventListener('change', ()=> applyRememberedColor());
 
-      // Nach dem Laden des Modells: Materialien befüllen
+      // Reagiere auf geladenes Modell: Materialien neu einlesen
       mv.addEventListener('load', ()=>{
         const mats = mv?.model?.materials || [];
         if(!mats.length){
@@ -209,23 +263,16 @@
           return;
         }
         alertEl.style.display='none';
-
-        // Liste anzeigen
         listEl.innerHTML = mats.map(m=>`• ${m.name}`).join('<br>');
-
-        // Dropdown füllen
         fillMaterialSelect(mats);
-
-        // Standard: erstes Material wählen
         materialSelect.value = mats[0]?.name || materialSelect.options[0]?.value;
-
-        // ggf. gemerkte Farbe anwenden
         applyRememberedColor();
       });
 
       // Init
-      fillModelSelect();
-      mv.src = modelSelect.value;
+      fillGrid();
+      // Start: erstes Modell aktivieren
+      selectModel(models[0].src, document.querySelector('.card'));
     </script>
   </body>
 </html>
