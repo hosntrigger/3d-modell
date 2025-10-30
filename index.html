@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>3D – Klappmouse</title>
+
+    <!-- Lokale Einbindung (ohne CDN): bitte die beiden Dateien in /lib ablegen -->
+    <script type="module" src="./lib/model-viewer.min.js"></script>
+    <script nomodule src="./lib/model-viewer-legacy.js"></script>
+
+    <style>
+      :root { color-scheme: light dark; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        background: #0f172a; /* slate-900 */
+        display: grid;
+        place-items: center;
+      }
+      .wrap {
+        width: min(1100px, 92vw);
+        margin: 4vh auto;
+      }
+      header { color: #e2e8f0; margin-bottom: 12px; }
+      header h1 { margin: 0 0 4px 0; font-size: clamp(20px, 3.4vw, 28px); }
+      header p { margin: 0; opacity: .85; font-size: 14px; }
+      model-viewer {
+        width: 100%;
+        height: min(72vh, 72vw);
+        background: #111827; /* gray-900 */
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,.45);
+      }
+      .hint { color: #94a3b8; margin-top: 10px; font-size: 12px; }
+      footer { color: #94a3b8; margin-top: 16px; font-size: 12px; text-align: center; }
+      model-viewer::part(default-ar-button) {
+        border-radius: 999px; padding: 10px 14px; border: 0; font-weight: 600;
+        box-shadow: 0 6px 18px rgba(0,0,0,.35);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Klappmouse 3D</h1>
+        <p>Mit Maus/Touch drehen &amp; zoomen. AR auf kompatiblen Geräten.</p>
+      </header>
+
+      <model-viewer
+        src="assets/klappmouse_bake_0003.glb"
+        alt="3D-Modell: Klappmouse"
+        camera-controls
+        auto-rotate
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        environment-image="neutral"
+        exposure="1"
+        shadow-intensity="1"
+        shadow-softness="0.4"
+        interaction-prompt="auto"
+        interaction-prompt-style="basic"
+        touch-action="pan-y"
+        tone-mapping="aces"
+        reveal="auto">
+        Dein Browser unterstützt das &lt;model-viewer&gt;-Element nicht.
+      </model-viewer>
+
+      <div class="hint">
+        Lege deine GLB Datei unter <code>assets/klappmouse_bake_0003.glb</code> ab. 
+        Achte auf exakte Groß-/Kleinschreibung.
+      </div>
+
+      <footer>Bereitgestellt mit &lt;model-viewer&gt;</footer>
+    </div>
+  </body>
+</html>
